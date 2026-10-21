@@ -1,0 +1,15 @@
+---
+description: OxyKit.Mail agent defaults - prefer AGENTS.md
+alwaysApply: true
+---
+
+# OxyKit.Mail agent defaults
+
+- Start from `AGENTS.md`. Product is **private pre-release** (no public GitHub/release yet).
+- Layout: `src/` + `tests/` + `hoppscotch/` (`OxyKit.Mail.slnx`).
+- Pure VSA features: `Identity`, `ApiKeys`, `Email`, `Dashboard` under `src/OxyKit.Mail/Features/`.
+- Flat feature files; subfolders only `Services/` and `Configuration/`.
+- Auth: trust `Roles()` / schemes in `Configure()`; dual JWT + `X-Api-Key`; use `AppRoles.*`.
+- Tests are **xUnit** under `tests/OxyKit.Mail.Tests/`. Runtime **http://localhost:5026** + Scalar at `/scalar`.
+- After endpoint/config changes: update Hoppscotch / `ENVIRONMENT_SETTINGS.md` / `CHANGELOG.md` as applicable.
+- Frontend work belongs in `../oxykit-mail-web`.

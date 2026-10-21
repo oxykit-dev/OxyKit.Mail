@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- Modern .NET only. Framework 2.0/4.5+: docs/DOTNET_FRAMEWORK_INTEGRATION.md (raw HTTP). -->
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>OxyKit.Mail.Client</RootNamespace>
+    <Description>Typed HttpClient SDK for OxyKit.Mail send (API key / Bearer). Not a dashboard client.</Description>
+    <PackageId>OxyKit.Mail.Client</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>OxyKit.Mail</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://oxykit.dev</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/oxykit-dev/OxyKit.Mail</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>oxykit;mail;email;httpclient</PackageTags>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OxyKit.Mail.Contracts\OxyKit.Mail.Contracts.csproj" />
+  </ItemGroup>
+</Project>

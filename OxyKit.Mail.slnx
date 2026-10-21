@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/OxyKit.Mail/OxyKit.Mail.csproj" />
+    <Project Path="src/OxyKit.Mail.Client/OxyKit.Mail.Client.csproj" />
+    <Project Path="src/OxyKit.Mail.Contracts/OxyKit.Mail.Contracts.csproj" />
+    <Project Path="src/OxyKit.Mail.Infrastructure/OxyKit.Mail.Infrastructure.csproj" />
+    <Project Path="src/OxyKit.Mail.Infrastructure.Postgres/OxyKit.Mail.Infrastructure.Postgres.csproj" />
+    <Project Path="src/OxyKit.Mail.Infrastructure.Sqlite/OxyKit.Mail.Infrastructure.Sqlite.csproj" />
+    <Project Path="src/OxyKit.Mail.Infrastructure.SqlServer/OxyKit.Mail.Infrastructure.SqlServer.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/OxyKit.Mail.Tests/OxyKit.Mail.Tests.csproj" />
+    <Project Path="tests/OxyKit.Mail.Client.Tests/OxyKit.Mail.Client.Tests.csproj" />
+  </Folder>
+</Solution>

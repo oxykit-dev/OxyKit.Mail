@@ -1,0 +1,528 @@
+{
+  "v": 12,
+  "name": "OxyKit.Mail",
+  "variables": [],
+  "description": "Local smoke tests for OxyKit.Mail API (setup/login \u2192 JWT \u2192 API key \u2192 send \u2192 dashboard). Import with OxyKit.Mail.environment.json, select OxyKit.Mail Local, run the collection in folder order.",
+  "folders": [
+    {
+      "v": 12,
+      "name": "Health & Security",
+      "variables": [],
+      "description": "Anonymous health + auth gate.",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "id": "mail-health",
+          "name": "GET /health",
+          "method": "GET",
+          "endpoint": "<<baseUrl>>/health",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200 or 503\", () => {\n  const s = pw.response.status;\n  pw.expect(s === 200 || s === 503).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "SMTP probe may return 503 Unhealthy; host must still respond."
+        },
+        {
+          "v": "17",
+          "id": "mail-me-unauthorized",
+          "name": "GET /auth/me without token \u2192 401",
+          "method": "GET",
+          "endpoint": "<<baseUrl>>/api/v1/auth/me",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 401\", () => {\n  pw.expect(pw.response.status).toBe(401);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "id": "mail-send-unauthorized",
+          "name": "POST /email/send without auth \u2192 401",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/api/v1/email/send",
+          "params": [],
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 401\", () => {\n  pw.expect(pw.response.status).toBe(401);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\"to\": \"smoke@example.com\", \"cc\": \"\", \"bcc\": \"\", \"subject\": \"unauth\", \"body\": \"<p>no</p>\", \"isHtml\": true, \"attachments\": null, \"scheduledFor\": null}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": ""
+    },
+    {
+      "v": 12,
+      "name": "Setup & Auth",
+      "variables": [],
+      "description": "Bootstrap admin if needed, then login and capture JWT.",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "id": "mail-needs-admin",
+          "name": "GET /setup/needs-admin",
+          "method": "GET",
+          "endpoint": "<<baseUrl>>/api/v1/setup/needs-admin",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"returns needsAdmin boolean\", () => {\n  pw.expect(typeof pw.response.body.needsAdmin).toBe(\"boolean\");\n});\npw.env.set(\"needsAdmin\", String(pw.response.body.needsAdmin));\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "id": "mail-create-admin",
+          "name": "POST /setup/create-admin (ok if already exists)",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/api/v1/setup/create-admin",
+          "params": [],
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200 or 403\", () => {\n  const s = pw.response.status;\n  pw.expect(s === 200 || s === 403).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"userName\": \"<<adminUser>>\",\n  \"email\": \"<<adminEmail>>\",\n  \"password\": \"<<adminPassword>>\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "200 on first bootstrap; 403 when an admin already exists."
+        },
+        {
+          "v": "17",
+          "id": "mail-login",
+          "name": "POST /auth/login",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/api/v1/auth/login",
+          "params": [],
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"returns tokens\", () => {\n  pw.expect(typeof pw.response.body.token).toBe(\"string\");\n  pw.expect(pw.response.body.token.length > 10).toBe(true);\n  pw.expect(typeof pw.response.body.refreshToken).toBe(\"string\");\n});\npw.env.set(\"accessToken\", pw.response.body.token);\npw.env.set(\"refreshToken\", pw.response.body.refreshToken);\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"identifier\": \"<<adminEmail>>\",\n  \"password\": \"<<adminPassword>>\",\n  \"deviceId\": \"<<deviceId>>\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "id": "mail-me",
+          "name": "GET /auth/me",
+          "method": "GET",
+          "endpoint": "<<baseUrl>>/api/v1/auth/me",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<accessToken>>",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"has roles\", () => {\n  pw.expect(Array.isArray(pw.response.body.roles)).toBe(true);\n  pw.expect(pw.response.body.roles.includes(\"Admin\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": ""
+    },
+    {
+      "v": 12,
+      "name": "API Keys",
+      "variables": [],
+      "description": "Create key (Admin) and capture plainApiKey for send-via-key smoke.",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "id": "mail-apikey-create",
+          "name": "POST /apikeys",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/api/v1/apikeys",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<accessToken>>",
+              "active": true,
+              "description": ""
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"returns plainApiKey once\", () => {\n  pw.expect(typeof pw.response.body.plainApiKey).toBe(\"string\");\n  pw.expect(pw.response.body.plainApiKey.length > 8).toBe(true);\n  pw.expect(typeof pw.response.body.id).toBe(\"string\");\n});\npw.env.set(\"apiKeyId\", pw.response.body.id);\npw.env.set(\"apiKey\", pw.response.body.plainApiKey);\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{ \"label\": \"hoppscotch-smoke\" }"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "id": "mail-apikey-list",
+          "name": "GET /apikeys",
+          "method": "GET",
+          "endpoint": "<<baseUrl>>/api/v1/apikeys",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<accessToken>>",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"returns array\", () => {\n  pw.expect(Array.isArray(pw.response.body)).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": ""
+    },
+    {
+      "v": 12,
+      "name": "Email",
+      "variables": [],
+      "description": "Accept contract: 200 sent | 202 accepted|scheduled. Do not re-send on accepted.",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "id": "mail-send-bearer",
+          "name": "POST /email/send (Bearer)",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/api/v1/email/send",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<accessToken>>",
+              "active": true,
+              "description": ""
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200 or 202\", () => {\n  const s = pw.response.status;\n  pw.expect(s === 200 || s === 202).toBe(true);\n});\npw.test(\"acceptance payload\", () => {\n  pw.expect(typeof pw.response.body.emailId).toBe(\"string\");\n  const st = pw.response.body.status;\n  pw.expect(st === \"sent\" || st === \"accepted\" || st === \"scheduled\").toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"to\": \"<<smokeTo>>\",\n  \"cc\": \"\",\n  \"bcc\": \"\",\n  \"subject\": \"OxyKit.Mail Hoppscotch smoke\",\n  \"body\": \"<p>Hoppscotch smoke test</p>\",\n  \"isHtml\": true,\n  \"attachments\": null,\n  \"scheduledFor\": null\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Requires working SMTP for sent; otherwise accepted (queued) is success."
+        },
+        {
+          "v": "17",
+          "id": "mail-send-apikey",
+          "name": "POST /email/send (X-Api-Key)",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/api/v1/email/send",
+          "params": [],
+          "headers": [
+            {
+              "key": "X-Api-Key",
+              "value": "<<apiKey>>",
+              "active": true,
+              "description": ""
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200 or 202\", () => {\n  const s = pw.response.status;\n  pw.expect(s === 200 || s === 202).toBe(true);\n});\npw.test(\"acceptance payload\", () => {\n  pw.expect(typeof pw.response.body.emailId).toBe(\"string\");\n  const st = pw.response.body.status;\n  pw.expect(st === \"sent\" || st === \"accepted\" || st === \"scheduled\").toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"to\": \"<<smokeTo>>\",\n  \"cc\": \"\",\n  \"bcc\": \"\",\n  \"subject\": \"OxyKit.Mail Hoppscotch smoke\",\n  \"body\": \"<p>Hoppscotch smoke test</p>\",\n  \"isHtml\": true,\n  \"attachments\": null,\n  \"scheduledFor\": null\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "id": "mail-dkim-dns",
+          "name": "GET /email/dkim/dns-record",
+          "method": "GET",
+          "endpoint": "<<baseUrl>>/api/v1/email/dkim/dns-record",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<accessToken>>",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200 or 400\", () => {\n  const s = pw.response.status;\n  pw.expect(s === 200 || s === 400).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "400 when DKIM disabled; 200 when configured."
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": ""
+    },
+    {
+      "v": 12,
+      "name": "Dashboard",
+      "variables": [],
+      "description": "Bearer Admin/User metrics.",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "id": "mail-dash-stats",
+          "name": "GET /dashboard/email-stats",
+          "method": "GET",
+          "endpoint": "<<baseUrl>>/api/v1/dashboard/email-stats",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<accessToken>>",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"has counters\", () => {\n  pw.expect(typeof pw.response.body.totalEmailsSent).toBe(\"number\");\n  pw.expect(typeof pw.response.body.totalEmailsFailed).toBe(\"number\");\n  pw.expect(typeof pw.response.body.totalEmailsQueued).toBe(\"number\");\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "id": "mail-dash-rate",
+          "name": "GET /dashboard/delivery-success-rate",
+          "method": "GET",
+          "endpoint": "<<baseUrl>>/api/v1/dashboard/delivery-success-rate",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<accessToken>>",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"has successRate\", () => {\n  pw.expect(typeof pw.response.body.successRate).toBe(\"number\");\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "id": "mail-dash-latest",
+          "name": "GET /dashboard/latest-emails",
+          "method": "GET",
+          "endpoint": "<<baseUrl>>/api/v1/dashboard/latest-emails?count=5",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<accessToken>>",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"returns array\", () => {\n  pw.expect(Array.isArray(pw.response.body)).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": ""
+    }
+  ],
+  "requests": [],
+  "auth": {
+    "authType": "none",
+    "authActive": true
+  },
+  "headers": [],
+  "preRequestScript": "",
+  "testScript": ""
+}

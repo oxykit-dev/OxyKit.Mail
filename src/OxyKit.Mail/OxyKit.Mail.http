@@ -1,0 +1,19 @@
+@OxyKit.Mail_HostAddress = http://localhost:5026
+
+### Health
+GET {{OxyKit.Mail_HostAddress}}/health
+Accept: application/json
+
+### Needs admin (bootstrap)
+GET {{OxyKit.Mail_HostAddress}}/api/v1/setup/needs-admin
+Accept: application/json
+
+### Login (replace body)
+POST {{OxyKit.Mail_HostAddress}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "identifier": "admin@phaseflow.local",
+  "password": "change-me",
+  "deviceId": "http-file"
+}

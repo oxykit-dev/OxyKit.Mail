@@ -1,0 +1,60 @@
+{
+  "name": "OxyKit.Mail Local",
+  "variables": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5026",
+      "secret": false
+    },
+    {
+      "key": "adminUser",
+      "value": "admin",
+      "secret": false
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@oxykit.local",
+      "secret": false
+    },
+    {
+      "key": "adminPassword",
+      "value": "DevLocalPassw0rd!",
+      "secret": true
+    },
+    {
+      "key": "deviceId",
+      "value": "hoppscotch-smoke",
+      "secret": false
+    },
+    {
+      "key": "smokeTo",
+      "value": "smoke@example.com",
+      "secret": false
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "secret": true
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "secret": true
+    },
+    {
+      "key": "apiKey",
+      "value": "",
+      "secret": true
+    },
+    {
+      "key": "apiKeyId",
+      "value": "",
+      "secret": false
+    },
+    {
+      "key": "needsAdmin",
+      "value": "",
+      "secret": false
+    }
+  ]
+}
