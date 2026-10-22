@@ -1,10 +1,14 @@
 # OxyKit.Mail
 
-Email delivery API for the [OxyKit](https://oxykit.dev) suite: queue + retries, optional DKIM, JWT / API-key auth, dashboard metrics, SignalR.
+[![CI](https://github.com/oxykit-dev/OxyKit.Mail/actions/workflows/ci.yml/badge.svg)](https://github.com/oxykit-dev/OxyKit.Mail/actions/workflows/ci.yml)
+[![NuGet](https://img.shields.io/nuget/v/OxyKit.Mail.Client.svg?label=OxyKit.Mail.Client)](https://www.nuget.org/packages/OxyKit.Mail.Client)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-**License:** MIT · **Client:** [`OxyKit.Mail.Client`](https://www.nuget.org/packages/OxyKit.Mail.Client) `0.1.1` · **Org:** [oxykit-dev](https://github.com/oxykit-dev)  
-**Releases:** [app zips](https://github.com/oxykit-dev/OxyKit.Mail/releases) · **Site:** [oxykit.dev](https://oxykit.dev)  
-**Config:** [ENVIRONMENT_SETTINGS.md](./ENVIRONMENT_SETTINGS.md) · **UI:** [oxykit-mail-web](https://github.com/oxykit-dev/oxykit-mail-web)
+Email **delivery API** for the [OxyKit](https://oxykit.dev) suite: queue + retries, optional DKIM, JWT / API-key auth, dashboard metrics, SignalR.
+
+**License:** MIT · **Org:** [oxykit-dev](https://github.com/oxykit-dev) · **Site:** [oxykit.dev](https://oxykit.dev)  
+**Releases:** [app zips](https://github.com/oxykit-dev/OxyKit.Mail/releases) · **Client:** [`OxyKit.Mail.Client`](https://www.nuget.org/packages/OxyKit.Mail.Client)  
+**Related:** [ENVIRONMENT_SETTINGS.md](./ENVIRONMENT_SETTINGS.md) · UI [oxykit-mail-web](https://github.com/oxykit-dev/oxykit-mail-web)
 
 ## Quick start
 
@@ -28,24 +32,24 @@ Jwt__Audience=OxyKit.Mail
 dotnet run --project src/OxyKit.Mail/OxyKit.Mail.csproj
 ```
 
-| URL | Purpose |
-|-----|---------|
+| URL / header | Purpose |
+|--------------|---------|
 | `http://localhost:5026` | API |
-| `http://localhost:5026/scalar` | OpenAPI UI (Development) |
-| `http://localhost:5026/openapi/v1.json` | OpenAPI JSON (Development) |
-| `http://localhost:5026/health` | Health (SMTP probe may be Unhealthy) |
-| `http://localhost:5026/hubs/dashboard` | SignalR |
+| `X-Api-Key` or Bearer JWT | Auth (create a sender key after bootstrap) |
+| `GET /health` | Health (SMTP probe may be Unhealthy) |
+| `/scalar`, `/openapi/v1.json` | OpenAPI UI + JSON (Development only) |
+| `/hubs/dashboard` | SignalR |
 
 First run: `GET /api/v1/setup/needs-admin`, then `POST /api/v1/setup/create-admin` if needed.
-
-**Smoke:** import [`hoppscotch/`](./hoppscotch/) collection + env → **OxyKit.Mail Local** → run folders in order.
-
-**SMTP OAuth2** (M365 / Google): see [ENVIRONMENT_SETTINGS.md](./ENVIRONMENT_SETTINGS.md#smtp-oauth2).
 
 ```bash
 dotnet test tests/OxyKit.Mail.Tests/OxyKit.Mail.Tests.csproj
 dotnet test tests/OxyKit.Mail.Client.Tests/OxyKit.Mail.Client.Tests.csproj
 ```
+
+**Smoke:** import [`hoppscotch/`](./hoppscotch/) collection + env → **OxyKit.Mail Local** → run folders in order.
+
+**SMTP OAuth2** (M365 / Google): see [ENVIRONMENT_SETTINGS.md](./ENVIRONMENT_SETTINGS.md#smtp-oauth2).
 
 ## NuGet (Client)
 
@@ -53,7 +57,9 @@ dotnet test tests/OxyKit.Mail.Client.Tests/OxyKit.Mail.Client.Tests.csproj
 dotnet add package OxyKit.Mail.Client
 ```
 
-Also: `OxyKit.Mail.Contracts` (transitive). `MailClient.SendAsync` only — not a dashboard SDK. Auth: API key or Bearer. Releases: tag `v*` → [docs/NUGET_PUBLISH.md](./docs/NUGET_PUBLISH.md).
+Also: `OxyKit.Mail.Contracts` (transitive). `MailClient.SendAsync` only — not a dashboard SDK. Auth: API key or Bearer. Tag `v*` → [docs/NUGET_PUBLISH.md](./docs/NUGET_PUBLISH.md).
+
+**.NET Framework 2.0 / 4.5+:** do not use the Client package — call HTTP per the [Framework HOW-TO](https://oxykit.dev/integrate/framework).
 
 Local suite checkout (optional):
 
@@ -61,14 +67,13 @@ Local suite checkout (optional):
 <ProjectReference Include="..\OxyKit.Mail\src\OxyKit.Mail.Client\OxyKit.Mail.Client.csproj" />
 ```
 
-**.NET Framework 2.0 / 4.5+:** do not use the Client package — call HTTP per the Framework HOW-TO on the docs site.
-
 ## Docs
 
 | Doc | Role |
 |-----|------|
 | [AGENTS.md](./AGENTS.md) | Layout, auth, ErrorOr, change checklist |
 | [ENVIRONMENT_SETTINGS.md](./ENVIRONMENT_SETTINGS.md) | `.env` / config / DKIM / OAuth2 |
+| [oxykit.dev/mail](https://oxykit.dev/mail/) | Product docs |
 | [hoppscotch/](./hoppscotch/) | Manual HTTP smoke |
 | [CHANGELOG.md](./CHANGELOG.md) | Keep a Changelog |
 | `/scalar` · `/openapi/v1.json` | Live API shapes (Development) |
