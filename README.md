@@ -2,8 +2,9 @@
 
 Email delivery API for the [OxyKit](https://oxykit.dev) suite: queue + retries, optional DKIM, JWT / API-key auth, dashboard metrics, SignalR.
 
-**License:** MIT · **Version:** 0.1.0 (pre-1.0) · **Org:** [oxykit-dev](https://github.com/oxykit-dev)  
-**Site:** [oxykit.dev](https://oxykit.dev) · **Config:** [ENVIRONMENT_SETTINGS.md](./ENVIRONMENT_SETTINGS.md) · **UI:** [oxykit-mail-web](https://github.com/oxykit-dev/oxykit-mail-web)
+**License:** MIT · **Client:** [`OxyKit.Mail.Client`](https://www.nuget.org/packages/OxyKit.Mail.Client) `0.1.1` · **Org:** [oxykit-dev](https://github.com/oxykit-dev)  
+**Releases:** [app zips](https://github.com/oxykit-dev/OxyKit.Mail/releases) · **Site:** [oxykit.dev](https://oxykit.dev)  
+**Config:** [ENVIRONMENT_SETTINGS.md](./ENVIRONMENT_SETTINGS.md) · **UI:** [oxykit-mail-web](https://github.com/oxykit-dev/oxykit-mail-web)
 
 ## Quick start
 
