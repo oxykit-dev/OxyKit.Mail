@@ -18,6 +18,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\..\docs\nuget\OxyKit.Mail.Client.md" Pack="true" PackagePath="README.md" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\OxyKit.Mail.Contracts\OxyKit.Mail.Contracts.csproj" />
   </ItemGroup>
 </Project>

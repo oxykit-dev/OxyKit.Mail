@@ -16,4 +16,8 @@
     <PackageTags>oxykit;mail;contracts</PackageTags>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\nuget\OxyKit.Mail.Contracts.md" Pack="true" PackagePath="README.md" />
+  </ItemGroup>
 </Project>

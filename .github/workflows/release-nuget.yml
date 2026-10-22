@@ -1,0 +1,119 @@
+name: Release NuGet
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: nuget
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate version matches projects
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          for proj in \
+            src/OxyKit.Mail.Contracts/OxyKit.Mail.Contracts.csproj \
+            src/OxyKit.Mail.Client/OxyKit.Mail.Client.csproj
+          do
+            PROJECT_VERSION=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' "$proj" | head -1)
+            if [ "$PROJECT_VERSION" != "$VERSION" ]; then
+              echo "::error::Tag version ($VERSION) does not match $proj ($PROJECT_VERSION)"
+              exit 1
+            fi
+          done
+
+      - name: Restore
+        run: dotnet restore OxyKit.Mail.slnx
+
+      - name: Build
+        run: dotnet build OxyKit.Mail.slnx --no-restore -c Release
+
+      - name: Test
+        run: |
+          dotnet test tests/OxyKit.Mail.Tests/OxyKit.Mail.Tests.csproj --no-build -c Release --verbosity normal
+          dotnet test tests/OxyKit.Mail.Client.Tests/OxyKit.Mail.Client.Tests.csproj --no-build -c Release --verbosity normal
+
+      - name: Pack Contracts + Client
+        run: |
+          mkdir -p artifacts
+          dotnet pack src/OxyKit.Mail.Contracts/OxyKit.Mail.Contracts.csproj -c Release --no-build -o ./artifacts
+          dotnet pack src/OxyKit.Mail.Client/OxyKit.Mail.Client.csproj -c Release --no-build -o ./artifacts
+
+      # 1) Publish Contracts + Client to nuget.org
+      - name: NuGet login (OIDC)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push Contracts + Client to nuget.org
+        run: |
+          dotnet nuget push ./artifacts/*.nupkg \
+            --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+      # 2) Contracts + Client zip (for GitHub Release download)
+      - name: Zip Contracts + Client packages
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          NUGET_ZIP="OxyKit.Mail.Client-${VERSION}-nuget.zip"
+          (cd artifacts && zip -r "../${NUGET_ZIP}" .)
+          echo "NUGET_ZIP=${NUGET_ZIP}" >> "$GITHUB_ENV"
+
+      # 3) Runnable app zip
+      - name: Publish and zip runnable app
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          mkdir -p publish/app
+          # Framework-dependent (portable). Requires .NET 10 runtime on the machine.
+          # No AppHost: the CI runner is Linux; a native host would not be cross-OS.
+          dotnet publish src/OxyKit.Mail/OxyKit.Mail.csproj \
+            -c Release --no-build \
+            -o ./publish/app \
+            -p:UseAppHost=false
+          rm -f ./publish/app/.env ./publish/app/*.db ./publish/app/appsettings.Development.json
+          printf '%s\n' \
+            "OxyKit.Mail ${VERSION}" \
+            "" \
+            "Requires the .NET 10 runtime:" \
+            "  https://dotnet.microsoft.com/download/dotnet/10.0" \
+            "" \
+            "Create a .env next to the app (see ENVIRONMENT_SETTINGS on the docs site), then:" \
+            "" \
+            "  export ASPNETCORE_URLS='http://localhost:5026'" \
+            "  dotnet OxyKit.Mail.dll" \
+            "" \
+            "Docs: https://oxykit.dev" \
+            > ./publish/app/README.txt
+          APP_ZIP="OxyKit.Mail-${VERSION}-dotnet.zip"
+          (cd publish/app && zip -r "../../${APP_ZIP}" .)
+          echo "APP_ZIP=${APP_ZIP}" >> "$GITHUB_ENV"
+
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            ${{ env.NUGET_ZIP }}
+            ${{ env.APP_ZIP }}
+            artifacts/*.nupkg
+            artifacts/*.snupkg

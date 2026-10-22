@@ -6,7 +6,7 @@ Token-efficient map. Prefer this over README / OpenAPI dumps.
 
 **OxyKit** suite core. .NET 10 email delivery: queue + retries, DKIM, JWT + API keys, dashboard, SignalR. UI: sibling **`../oxykit-mail-web/`**.
 
-**MIT** · v0.1 — changelog stays `[Unreleased]` until first SemVer tag. Client/Contracts packable.
+**MIT** · v0.1 — Client/Contracts packable (nuget.org via Trusted Publishing / `release-nuget.yml`). See `docs/NUGET_PUBLISH.md`.
 
 **vs Flow:** Mail owns SMTP (send / queue / retry / dead-letter). `POST /email/send` → `sent` (200) | `accepted`/`scheduled` (202). Callers **must not re-send** on `accepted`. Flow only orchestrates jobs.
 

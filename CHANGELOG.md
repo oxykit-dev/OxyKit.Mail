@@ -1,10 +1,10 @@
 # Changelog
 
-Pre-release — everything lives under **`[Unreleased]`** until the first public SemVer tag.
-
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+
+## [0.1.0] - 2026-10-22
 
 ### Added
 
@@ -13,6 +13,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - SMTP OAuth2 (Microsoft / Google, config-only)
 - Hoppscotch smoke (`hoppscotch/`) + `/health` integration smoke
 - ApiKeyService unit tests; `IApiKeyRepository`
+- Trusted Publishing release workflow (`.github/workflows/release-nuget.yml`); package READMEs + symbol packages
 
 ### Changed
 

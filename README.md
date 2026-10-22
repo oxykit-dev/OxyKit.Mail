@@ -52,9 +52,9 @@ dotnet test tests/OxyKit.Mail.Client.Tests/OxyKit.Mail.Client.Tests.csproj
 dotnet add package OxyKit.Mail.Client
 ```
 
-Also: `OxyKit.Mail.Contracts`. `MailClient.SendAsync` only — not a dashboard SDK. Auth: API key or Bearer.
+Also: `OxyKit.Mail.Contracts` (transitive). `MailClient.SendAsync` only — not a dashboard SDK. Auth: API key or Bearer. Releases: tag `v*` → [docs/NUGET_PUBLISH.md](./docs/NUGET_PUBLISH.md).
 
-Until packages are on nuget.org, reference the project from a sibling checkout:
+Local suite checkout (optional):
 
 ```xml
 <ProjectReference Include="..\OxyKit.Mail\src\OxyKit.Mail.Client\OxyKit.Mail.Client.csproj" />
@@ -69,6 +69,6 @@ Until packages are on nuget.org, reference the project from a sibling checkout:
 | [AGENTS.md](./AGENTS.md) | Layout, auth, ErrorOr, change checklist |
 | [ENVIRONMENT_SETTINGS.md](./ENVIRONMENT_SETTINGS.md) | `.env` / config / DKIM / OAuth2 |
 | [hoppscotch/](./hoppscotch/) | Manual HTTP smoke |
-| [CHANGELOG.md](./CHANGELOG.md) | `[Unreleased]` until first SemVer tag |
+| [CHANGELOG.md](./CHANGELOG.md) | Keep a Changelog |
 | `/scalar` · `/openapi/v1.json` | Live API shapes (Development) |
 | [LICENSE](./LICENSE) | MIT |
