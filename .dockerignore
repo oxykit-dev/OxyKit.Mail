@@ -1,0 +1,10 @@
+**/bin/
+**/obj/
+**/.git/
+**/.cursor/
+**/TestResults/
+**/hoppscotch/
+**/*.md
+**/tests/
+.env
+**/.env
