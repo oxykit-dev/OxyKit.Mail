@@ -7,7 +7,7 @@
     <RootNamespace>OxyKit.Mail.Client</RootNamespace>
     <Description>Typed HttpClient SDK for OxyKit.Mail send (API key / Bearer). Not a dashboard client.</Description>
     <PackageId>OxyKit.Mail.Client</PackageId>
-    <Version>0.1.3</Version>
+    <Version>0.1.4</Version>
     <Authors>OxyKit.Mail</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://oxykit.dev</PackageProjectUrl>

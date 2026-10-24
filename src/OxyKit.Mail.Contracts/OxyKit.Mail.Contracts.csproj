@@ -7,7 +7,7 @@
     <RootNamespace>OxyKit.Mail.Contracts</RootNamespace>
     <Description>Shared send request/response contracts for OxyKit.Mail (API key / integrator surface).</Description>
     <PackageId>OxyKit.Mail.Contracts</PackageId>
-    <Version>0.1.3</Version>
+    <Version>0.1.4</Version>
     <Authors>OxyKit.Mail</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://oxykit.dev</PackageProjectUrl>
