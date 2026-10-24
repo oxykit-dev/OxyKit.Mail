@@ -14,10 +14,12 @@
     <RepositoryUrl>https://github.com/oxykit-dev/OxyKit.Mail</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>oxykit;mail;contracts</PackageTags>
+    <PackageIcon>images/icon.png</PackageIcon>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\docs\nuget\OxyKit.Mail.Contracts.md" Pack="true" PackagePath="README.md" />
+    <None Include="..\..\docs\nuget\icon.png" Pack="true" PackagePath="images/" />
   </ItemGroup>
 </Project>
