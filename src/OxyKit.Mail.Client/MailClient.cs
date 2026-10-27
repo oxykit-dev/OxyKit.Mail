@@ -103,16 +103,31 @@ public sealed class MailClient : IDisposable
 
     /// <summary>
     /// <c>POST /api/v1/email/send</c>. Succeeds on HTTP 200/202 with status sent/accepted/scheduled.
+    /// Optional <paramref name="idempotencyKey"/> sets the <c>Idempotency-Key</c> header so duplicate posts return the same acceptance.
     /// </summary>
     public async Task<MailSendResult> SendAsync(
         SendEmailRequest request,
+        CancellationToken cancellationToken = default
+    ) => await SendAsync(request, idempotencyKey: null, cancellationToken).ConfigureAwait(false);
+
+    /// <inheritdoc cref="SendAsync(SendEmailRequest, CancellationToken)"/>
+    public async Task<MailSendResult> SendAsync(
+        SendEmailRequest request,
+        string? idempotencyKey,
         CancellationToken cancellationToken = default
     )
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "api/v1/email/send")
+        {
+            Content = JsonContent.Create(request, options: JsonOptions),
+        };
+        if (!string.IsNullOrWhiteSpace(idempotencyKey))
+            httpRequest.Headers.TryAddWithoutValidation("Idempotency-Key", idempotencyKey.Trim());
+
         using var response = await _http
-            .PostAsJsonAsync("api/v1/email/send", request, JsonOptions, cancellationToken)
+            .SendAsync(httpRequest, cancellationToken)
             .ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)

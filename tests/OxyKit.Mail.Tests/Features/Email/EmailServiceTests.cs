@@ -40,6 +40,11 @@ public class EmailServiceTests
         _messageRepoMock
             .Setup(x => x.UpdateAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
+        _messageRepoMock
+            .Setup(x =>
+                x.GetByIdempotencyKeyAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())
+            )
+            .ReturnsAsync((Message?)null);
 
         _sut = new EmailService<TestHub>(
             _messageRepoMock.Object,
@@ -77,7 +82,7 @@ public class EmailServiceTests
             .Callback<Message, CancellationToken>((m, _) => m.MarkAsSent())
             .ReturnsAsync(Result.Success);
 
-        var result = await _sut.AcceptAsync(ValidRequest(), _ct);
+        var result = await _sut.AcceptAsync(ValidRequest(), ct: _ct);
 
         result.IsError.Should().BeFalse();
         result.Value.Status.Should().Be(SendEmailStatus.Sent);
@@ -110,7 +115,7 @@ public class EmailServiceTests
             .Callback<Message, CancellationToken>((m, _) => queued = m)
             .Returns(Task.CompletedTask);
 
-        var result = await _sut.AcceptAsync(ValidRequest(), _ct);
+        var result = await _sut.AcceptAsync(ValidRequest(), ct: _ct);
 
         result.IsError.Should().BeFalse();
         result.Value.Status.Should().Be(SendEmailStatus.Accepted);
@@ -146,7 +151,7 @@ public class EmailServiceTests
             .Callback<Message, CancellationToken>((m, _) => queued = m)
             .Returns(Task.CompletedTask);
 
-        var result = await _sut.AcceptAsync(ValidRequest(), _ct);
+        var result = await _sut.AcceptAsync(ValidRequest(), ct: _ct);
 
         result.IsError.Should().BeFalse();
         result.Value.Status.Should().Be(SendEmailStatus.Accepted);
@@ -171,7 +176,7 @@ public class EmailServiceTests
 
         var request = ValidRequest();
         request.ScheduledFor = when;
-        var result = await _sut.AcceptAsync(request, _ct);
+        var result = await _sut.AcceptAsync(request, ct: _ct);
 
         result.IsError.Should().BeFalse();
         result.Value.Status.Should().Be(SendEmailStatus.Scheduled);
@@ -196,7 +201,7 @@ public class EmailServiceTests
         var request = ValidRequest();
         request.To = "";
         request.Subject = "";
-        var act = () => _sut.AcceptAsync(request, _ct);
+        var act = () => _sut.AcceptAsync(request, ct: _ct);
 
         await act.Should().ThrowAsync<System.ComponentModel.DataAnnotations.ValidationException>();
         _messageRepoMock.Verify(
@@ -207,6 +212,121 @@ public class EmailServiceTests
             x => x.SendAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>()),
             Times.Never
         );
+    }
+
+    [Fact]
+    public async Task AcceptAsync_SameIdempotencyKey_ReturnsExistingWithoutResend()
+    {
+        var existingId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+        _messageRepoMock
+            .Setup(x => x.GetByIdempotencyKeyAsync("flow-job:0", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                new Message
+                {
+                    Id = existingId,
+                    From = "sender@example.com",
+                    To = "recipient@example.com",
+                    Subject = "Hello",
+                    Body = "Hi",
+                    Status = MessageStatus.Sent,
+                    SentAt = DateTime.UtcNow,
+                }
+            );
+
+        var result = await _sut.AcceptAsync(ValidRequest(), "flow-job:0", _ct);
+
+        result.IsError.Should().BeFalse();
+        result.Value.EmailId.Should().Be(existingId);
+        result.Value.Status.Should().Be(SendEmailStatus.Sent);
+        _messageRepoMock.Verify(
+            x => x.AddAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>()),
+            Times.Never
+        );
+        _senderServiceMock.Verify(
+            x => x.SendAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>()),
+            Times.Never
+        );
+    }
+
+    [Fact]
+    public async Task AcceptAsync_IdempotencyKeyTooLong_ReturnsValidation()
+    {
+        var result = await _sut.AcceptAsync(ValidRequest(), new string('x', 129), _ct);
+
+        result.IsError.Should().BeTrue();
+        result.FirstError.Type.Should().Be(ErrorType.Validation);
+        _messageRepoMock.Verify(
+            x => x.AddAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>()),
+            Times.Never
+        );
+    }
+
+    [Fact]
+    public async Task AcceptAsync_WithIdempotencyKey_PersistsKeyOnMessage()
+    {
+        Message? persisted = null;
+        _messageRepoMock
+            .Setup(x => x.AddAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>()))
+            .Callback<Message, CancellationToken>((m, _) => persisted = m)
+            .Returns(Task.CompletedTask);
+        _senderServiceMock
+            .Setup(x => x.SendAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>()))
+            .Callback<Message, CancellationToken>((m, _) => m.MarkAsSent())
+            .ReturnsAsync(Result.Success);
+
+        var result = await _sut.AcceptAsync(ValidRequest(), "  my-key  ", _ct);
+
+        result.IsError.Should().BeFalse();
+        persisted!.IdempotencyKey.Should().Be("my-key");
+    }
+
+    [Fact]
+    public async Task AcceptAsync_ExistingFutureSchedule_ReturnsScheduled()
+    {
+        var when = DateTime.UtcNow.AddHours(2);
+        _messageRepoMock
+            .Setup(x => x.GetByIdempotencyKeyAsync("sched-key", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                new Message
+                {
+                    Id = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                    From = "sender@example.com",
+                    To = "recipient@example.com",
+                    Subject = "Hello",
+                    Body = "Hi",
+                    Status = MessageStatus.Queued,
+                    ScheduledFor = when,
+                }
+            );
+
+        var result = await _sut.AcceptAsync(ValidRequest(), "sched-key", _ct);
+
+        result.IsError.Should().BeFalse();
+        result.Value.Status.Should().Be(SendEmailStatus.Scheduled);
+    }
+
+    [Fact]
+    public async Task AcceptAsync_ExistingPastDueSchedule_ReturnsAccepted()
+    {
+        _messageRepoMock
+            .Setup(x => x.GetByIdempotencyKeyAsync("due-key", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                new Message
+                {
+                    Id = Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+                    From = "sender@example.com",
+                    To = "recipient@example.com",
+                    Subject = "Hello",
+                    Body = "Hi",
+                    Status = MessageStatus.Queued,
+                    ScheduledFor = DateTime.UtcNow.AddMinutes(-5),
+                }
+            );
+
+        var result = await _sut.AcceptAsync(ValidRequest(), "due-key", _ct);
+
+        result.IsError.Should().BeFalse();
+        result.Value.Status.Should().Be(SendEmailStatus.Accepted);
     }
 
     private static SendEmailRequest ValidRequest() =>

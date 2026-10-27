@@ -33,6 +33,7 @@ public class SendEndpoint(IEmailService emailService)
                 + "On SMTP failure the message is queued for Mail-side retry and status is 'accepted' (HTTP 202). "
                 + "When 'scheduledFor' is set, status is 'scheduled' (HTTP 202). "
                 + "Immediate SMTP success returns status 'sent' (HTTP 200). "
+                + "Optional Idempotency-Key header returns the existing acceptance without creating a duplicate. "
                 + "Callers (e.g. OxyKit.Flow) must treat sent/accepted/scheduled as success and must not re-send. "
                 + "Rate limited to prevent spam (50 requests per minute by default).";
             s.ResponseExamples[200] = new SendEmailResponse
@@ -59,7 +60,12 @@ public class SendEndpoint(IEmailService emailService)
             return;
         }
 
-        var result = await emailService.AcceptAsync(req, ct);
+        HttpContext.Request.Headers.TryGetValue("Idempotency-Key", out var keyHeader);
+        var idempotencyKey = keyHeader.ToString();
+        if (string.IsNullOrWhiteSpace(idempotencyKey))
+            idempotencyKey = null;
+
+        var result = await emailService.AcceptAsync(req, idempotencyKey, ct);
         if (await SendOnErrorAsync(result, ct))
             return;
 

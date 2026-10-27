@@ -4,6 +4,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Optional `Idempotency-Key` header on `POST /api/v1/email/send` — same key returns the existing acceptance (`emailId` / status) without creating or re-sending
+- `MailClient.SendAsync(request, idempotencyKey, ct)` overload; Contracts body unchanged
+
+### Changed
+
+- `Message.IdempotencyKey` + unique index (filtered on SQL Server); migrations for Sqlite / Postgres / SqlServer
+- Idempotency insert race handling only on unique-constraint violations (`DbUpdateExceptionExtensions`)
+- SQL Server idempotency unique index uses filtered `IS NOT NULL` in the EF model (matches migration)
+- Idempotent replay: `scheduled` only while `ScheduledFor` is still in the future; due/queued → `accepted`
+
 ## [0.1.0] - 2026-10-22
 
 ### Added

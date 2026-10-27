@@ -220,6 +220,10 @@ namespace OxyKit.Mail.Infrastructure.SqlServer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("IdempotencyKey")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
                     b.Property<bool>("IsHtml")
                         .HasColumnType("bit");
 
@@ -253,6 +257,10 @@ namespace OxyKit.Mail.Infrastructure.SqlServer.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique()
+                        .HasFilter("[IdempotencyKey] IS NOT NULL");
 
                     b.ToTable("Messages");
                 });

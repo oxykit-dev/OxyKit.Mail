@@ -27,6 +27,18 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(builder);
 
+        // SQLite / PostgreSQL allow multiple NULLs in a UNIQUE index.
+        // SQL Server needs a filtered unique index (only one NULL otherwise).
+        builder.Entity<Message>().Property(m => m.IdempotencyKey).HasMaxLength(128);
+        var idempotencyIndex = builder.Entity<Message>().HasIndex(m => m.IdempotencyKey).IsUnique();
+        if (
+            Database.ProviderName?.Contains("SqlServer", StringComparison.OrdinalIgnoreCase)
+            == true
+        )
+        {
+            idempotencyIndex.HasFilter("[IdempotencyKey] IS NOT NULL");
+        }
+
         // Configure Message-Attachment relationship
         builder
             .Entity<Attachment>()

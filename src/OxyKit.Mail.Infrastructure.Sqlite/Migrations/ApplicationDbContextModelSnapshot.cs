@@ -210,6 +210,10 @@ namespace OxyKit.Mail.Infrastructure.Sqlite.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("IdempotencyKey")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsHtml")
                         .HasColumnType("INTEGER");
 
@@ -243,6 +247,9 @@ namespace OxyKit.Mail.Infrastructure.Sqlite.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique();
 
                     b.ToTable("Messages");
                 });

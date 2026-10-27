@@ -23,6 +23,11 @@ public interface IMessageRepository
     Task<Message?> GetByIdAsync(Guid id, CancellationToken ct = default);
 
     /// <summary>
+    /// Gets a message by client idempotency key (when set).
+    /// </summary>
+    Task<Message?> GetByIdempotencyKeyAsync(string idempotencyKey, CancellationToken ct = default);
+
+    /// <summary>
     /// Gets queued messages ready for processing.
     /// </summary>
     Task<List<Message>> GetQueuedMessagesAsync(int batchSize, CancellationToken ct = default);

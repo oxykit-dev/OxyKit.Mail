@@ -220,6 +220,10 @@ namespace OxyKit.Mail.Infrastructure.Postgres.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("IdempotencyKey")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
                     b.Property<bool>("IsHtml")
                         .HasColumnType("boolean");
 
@@ -253,6 +257,9 @@ namespace OxyKit.Mail.Infrastructure.Postgres.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique();
 
                     b.ToTable("Messages");
                 });

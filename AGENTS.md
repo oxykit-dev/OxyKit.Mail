@@ -8,7 +8,7 @@ Token-efficient map. Prefer this over README / OpenAPI dumps.
 
 **MIT** · v0.1 — Client/Contracts packable (nuget.org via Trusted Publishing / `release-nuget.yml`). See `docs/NUGET_PUBLISH.md`.
 
-**vs Flow:** Mail owns SMTP (send / queue / retry / dead-letter). `POST /email/send` → `sent` (200) | `accepted`/`scheduled` (202). Callers **must not re-send** on `accepted`. Flow only orchestrates jobs.
+**vs Flow:** Mail owns SMTP (send / queue / retry / dead-letter). `POST /email/send` → `sent` (200) | `accepted`/`scheduled` (202). Optional `Idempotency-Key` returns the existing acceptance. Callers **must not re-send** on `accepted`. Flow only orchestrates jobs.
 
 ## Open these first
 

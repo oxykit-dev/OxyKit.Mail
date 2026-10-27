@@ -76,6 +76,13 @@ public class Message : EntityBase
     /// </summary>
     public string? DeadLetterReason { get; set; }
 
+    /// <summary>
+    /// Optional client-supplied key (e.g. <c>Idempotency-Key</c> header). Unique when set;
+    /// same key returns the existing message instead of accepting another send.
+    /// </summary>
+    [MaxLength(128)]
+    public string? IdempotencyKey { get; set; }
+
     #endregion
 
     #region Idempotency and Retry Tracking

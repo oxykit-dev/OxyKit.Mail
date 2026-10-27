@@ -136,6 +136,18 @@ public class MessageRepository(ApplicationDbContext context) : IMessageRepositor
             .ConfigureAwait(false);
     }
 
+    /// <inheritdoc />
+    public async Task<Message?> GetByIdempotencyKeyAsync(
+        string idempotencyKey,
+        CancellationToken ct = default
+    )
+    {
+        return await context
+            .Messages.AsNoTracking()
+            .FirstOrDefaultAsync(m => m.IdempotencyKey == idempotencyKey, ct)
+            .ConfigureAwait(false);
+    }
+
     /// <summary>
     /// Gets stuck messages that have been processing too long.
     /// </summary>

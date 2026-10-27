@@ -187,9 +187,37 @@ public class MailClientTests
         Assert.NotNull(client);
     }
 
+    [Fact]
+    public async Task SendAsync_with_idempotency_key_sets_header()
+    {
+        var handler = new StubHandler(
+            HttpStatusCode.OK,
+            """{"emailId":"22222222-2222-2222-2222-222222222222","status":"sent","message":"ok"}"""
+        );
+        using var http = new HttpClient(handler)
+        {
+            BaseAddress = new Uri("http://localhost:5026/"),
+        };
+        using var client = new MailClient(http);
+
+        await client.SendAsync(
+            new SendEmailRequest
+            {
+                To = "a@b.com",
+                Subject = "s",
+                Body = "b",
+            },
+            "job-id:0",
+            TestContext.Current.CancellationToken
+        );
+
+        Assert.Equal("job-id:0", handler.LastIdempotencyKey);
+    }
+
     private sealed class StubHandler(HttpStatusCode status, string body) : HttpMessageHandler
     {
         public string? LastPath { get; private set; }
+        public string? LastIdempotencyKey { get; private set; }
 
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
@@ -198,6 +226,8 @@ public class MailClientTests
         {
             if (request.RequestUri is not null)
                 LastPath = request.RequestUri.PathAndQuery.TrimStart('/');
+            if (request.Headers.TryGetValues("Idempotency-Key", out var values))
+                LastIdempotencyKey = values.FirstOrDefault();
 
             return Task.FromResult(
                 new HttpResponseMessage(status)
