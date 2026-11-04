@@ -39,7 +39,9 @@ dotnet run --project src/OxyKit.Mail/OxyKit.Mail.csproj
 | `GET /health` | Health (SMTP probe may be Unhealthy) |
 | `X-Correlation-Id` | Optional; echoed on every response (generated if omitted) |
 | `/scalar`, `/openapi/v1.json` | OpenAPI UI + JSON (Development only) |
-| `/hubs/dashboard` | SignalR |
+| `/hubs/dashboard` | SignalR (`Admin`\|`User`; JWT via `?access_token=` on `/hubs`) |
+
+**Roles:** `Sender` is send-only (POST send + Me). Dashboard REST/hub, users, and DKIM admin need `Admin` or `User`. Companion UI hides Sender-inaccessible nav — see [oxykit.dev/mail/auth](https://oxykit.dev/mail/auth).
 
 Observability: NuGet [`OxyKit.Observability`](https://www.nuget.org/packages/OxyKit.Observability) + [`OxyKit.OpenTelemetry`](https://www.nuget.org/packages/OxyKit.OpenTelemetry) (JSON stdout; optional OTLP via `OpenTelemetry:Enabled` or `OTEL_EXPORTER_OTLP_ENDPOINT`). See `AGENTS.md`, `ENVIRONMENT_SETTINGS.md`, and [oxykit.dev/guide/observability](https://oxykit.dev/guide/observability).
 
