@@ -22,11 +22,12 @@ public static class ApplicationBuilderExtensions
             c.Versioning.Prefix = "v";
             c.Versioning.PrependToRoute = true;
         });
-        if (app.Environment.IsDevelopment())
+        // Development: Scalar UI + JSON. Testing: JSON only (snapshot export / contract asserts).
+        if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
         {
-            // Suite convention: /openapi/v1.json + /scalar
             app.UseOpenApi(c => c.Path = "/openapi/{documentName}.json");
-            app.MapScalarApiReference();
+            if (app.Environment.IsDevelopment())
+                app.MapScalarApiReference();
         }
         app.MapHealthChecks("/health");
     }

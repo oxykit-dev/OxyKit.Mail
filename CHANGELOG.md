@@ -7,6 +7,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - Observability via NuGet `OxyKit.Observability` + `OxyKit.OpenTelemetry` (JSON console, `X-Correlation-Id`, optional OTLP); `MailTelemetry` meters/Activity for queue send
+- Testing host serves `/openapi/v1.json`; `OpenApiDocumentTests` asserts core routes (incl. DKIM) and can export the mail-web snapshot via `OXYKIT_EXPORT_OPENAPI`
 
 ### Changed
 

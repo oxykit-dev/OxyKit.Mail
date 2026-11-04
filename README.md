@@ -41,7 +41,7 @@ dotnet run --project src/OxyKit.Mail/OxyKit.Mail.csproj
 | `/scalar`, `/openapi/v1.json` | OpenAPI UI + JSON (Development only) |
 | `/hubs/dashboard` | SignalR (`Admin`\|`User`; JWT via `?access_token=` on `/hubs`) |
 
-**Roles:** `Sender` is send-only (POST send + Me). Dashboard REST/hub, users, and DKIM admin need `Admin` or `User`. Companion UI hides Sender-inaccessible nav — see [oxykit.dev/mail/auth](https://oxykit.dev/mail/auth).
+**Roles:** Send = `Admin`\|`Sender`. `Sender` is otherwise send-only (no dashboard/hub/users/DKIM). Dashboard REST/hub: `Admin`\|`User`. Companion UI mirrors that — see [oxykit.dev/mail/auth](https://oxykit.dev/mail/auth).
 
 Observability: NuGet [`OxyKit.Observability`](https://www.nuget.org/packages/OxyKit.Observability) + [`OxyKit.OpenTelemetry`](https://www.nuget.org/packages/OxyKit.OpenTelemetry) (JSON stdout; optional OTLP via `OpenTelemetry:Enabled` or `OTEL_EXPORTER_OTLP_ENDPOINT`). See `AGENTS.md`, `ENVIRONMENT_SETTINGS.md`, and [oxykit.dev/guide/observability](https://oxykit.dev/guide/observability).
 

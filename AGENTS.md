@@ -72,7 +72,7 @@ Shared libs (NuGet): `OxyKit.Observability` + `OxyKit.OpenTelemetry` — see [Ob
 
 - `X-Api-Key` → ApiKey scheme; else JWT Bearer
 - Roles: `Admin`, `User`, `Sender` (`AppRoles.*`)
-- Send: `Admin`|`Sender` + Bearer/ApiKey
+- Send: `Admin`|`Sender` + Bearer/ApiKey (`User` alone cannot send)
 - **Sender = send-only** — no dashboard stats, no dashboard SignalR hub, no identity/users/DKIM admin. Dashboard REST + hub: `Admin`|`User` only. Align `oxykit-mail-web` nav/routes the same way (hide, do not 403-wall).
 - JWT Bearer `OnMessageReceived`: accept `access_token` query for paths under `/hubs` (SignalR WebSockets)
 - Bootstrap: anonymous `/setup/*` only when no admin exists
@@ -90,8 +90,14 @@ Shared libs (NuGet): `OxyKit.Observability` + `OxyKit.OpenTelemetry` — see [Ob
 7. Note in `CHANGELOG.md` `[Unreleased]` when behavior changes
 8. Send contract change → update `OxyKit.Mail.Contracts` + `MailClient` tests; host validators stay in Features/Email
 
-Do not change HTTP paths without coordinating `oxykit-mail-web`. **API shapes:** Scalar (`/scalar`) + `/openapi/v1.json` (Development; suite convention). After contract changes, regenerate `../oxykit-mail-web/oxykit-mail-api.json` from that JSON.
+Do not change HTTP paths without coordinating `oxykit-mail-web`. **API shapes:** Scalar (`/scalar`) + `/openapi/v1.json` (Development; suite convention). Testing also serves `/openapi/v1.json` (no Scalar) for contract asserts / snapshot export.
 
+After contract changes, regenerate the companion snapshot:
+
+```bash
+OXYKIT_EXPORT_OPENAPI="$(pwd)/../oxykit-mail-web/oxykit-mail-api.json" \
+  dotnet test tests/OxyKit.Mail.Tests/OxyKit.Mail.Tests.csproj --filter OpenApiDocumentTests
+```
 
 ## Commands
 
