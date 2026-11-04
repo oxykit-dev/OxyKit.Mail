@@ -41,7 +41,7 @@ dotnet run --project src/OxyKit.Mail/OxyKit.Mail.csproj
 | `/scalar`, `/openapi/v1.json` | OpenAPI UI + JSON (Development only) |
 | `/hubs/dashboard` | SignalR |
 
-Observability: shared [`OxyKit.Observability`](../OxyKit.Observability/) + [`OxyKit.OpenTelemetry`](../OxyKit.Observability/) (JSON stdout; optional OTLP via `OpenTelemetry:Enabled` or `OTEL_EXPORTER_OTLP_ENDPOINT`). See `AGENTS.md`, `ENVIRONMENT_SETTINGS.md`, and [oxykit.dev/guide/observability](https://oxykit.dev/guide/observability).
+Observability: NuGet [`OxyKit.Observability`](https://www.nuget.org/packages/OxyKit.Observability) + [`OxyKit.OpenTelemetry`](https://www.nuget.org/packages/OxyKit.OpenTelemetry) (JSON stdout; optional OTLP via `OpenTelemetry:Enabled` or `OTEL_EXPORTER_OTLP_ENDPOINT`). See `AGENTS.md`, `ENVIRONMENT_SETTINGS.md`, and [oxykit.dev/guide/observability](https://oxykit.dev/guide/observability).
 
 First run: `GET /api/v1/setup/needs-admin`, then `POST /api/v1/setup/create-admin` if needed.
 

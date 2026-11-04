@@ -6,7 +6,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Observability via suite `OxyKit.Observability` + `OxyKit.OpenTelemetry` (JSON console, `X-Correlation-Id`, optional OTLP); `MailTelemetry` meters/Activity for queue send
+- Observability via NuGet `OxyKit.Observability` + `OxyKit.OpenTelemetry` (JSON console, `X-Correlation-Id`, optional OTLP); `MailTelemetry` meters/Activity for queue send
 
 ## [0.1.5] - 2026-10-27
 

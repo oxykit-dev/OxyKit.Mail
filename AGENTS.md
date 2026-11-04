@@ -62,7 +62,7 @@ Auth = FastEndpoints `Roles(...)` / schemes only — no DB permission table. `Me
 
 ## Observability
 
-Shared libs (suite ProjectReference): `OxyKit.Observability` + `OxyKit.OpenTelemetry` — see [`../OxyKit.Observability/AGENTS.md`](../OxyKit.Observability/AGENTS.md).
+Shared libs (NuGet): `OxyKit.Observability` + `OxyKit.OpenTelemetry` — see [Observability AGENTS](https://github.com/oxykit-dev/OxyKit.Observability/blob/master/AGENTS.md).
 
 - **Logs / correlation:** `AddOxyKitJsonConsole` + `UseOxyKitCorrelation`
 - **OTel:** `AddOxyKitOpenTelemetry` with `MailTelemetry` source/meter names; off by default

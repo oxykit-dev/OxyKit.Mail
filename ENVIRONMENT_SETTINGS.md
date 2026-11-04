@@ -121,7 +121,7 @@ Admin helpers: `POST /api/v1/email/dkim/generate-keys`, `GET /api/v1/email/dkim/
 
 ## Observability
 
-Implemented via suite packages `OxyKit.Observability` + `OxyKit.OpenTelemetry` (see [`../OxyKit.Observability/`](../OxyKit.Observability/) and [oxykit.dev/guide/observability](https://oxykit.dev/guide/observability)).
+Implemented via NuGet packages `OxyKit.Observability` + `OxyKit.OpenTelemetry` (see [oxykit.dev/guide/observability](https://oxykit.dev/guide/observability)).
 
 | Setting | Notes |
 |---------|-------|
