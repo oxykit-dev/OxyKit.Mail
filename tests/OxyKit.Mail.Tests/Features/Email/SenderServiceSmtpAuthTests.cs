@@ -1,8 +1,5 @@
-using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using Moq;
 using OxyKit.Mail.Features.Email.Configuration;
 using OxyKit.Mail.Features.Email.Services;
 using OxyKit.Mail.Infrastructure;

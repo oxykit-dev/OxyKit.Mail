@@ -1,4 +1,3 @@
-using FluentAssertions;
 using OxyKit.Mail.Features.Email.Configuration;
 
 namespace OxyKit.Mail.Tests.Features.Email;

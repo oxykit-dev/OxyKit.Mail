@@ -8,6 +8,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Observability via NuGet `OxyKit.Observability` + `OxyKit.OpenTelemetry` (JSON console, `X-Correlation-Id`, optional OTLP); `MailTelemetry` meters/Activity for queue send
 
+### Changed
+
+- **Sender = send-only:** document policy; `DashboardHub` requires `Admin`|`User` (Sender cannot join). JWT Bearer reads `access_token` query for SignalR `/hubs`. Dashboard REST endpoints already excluded Sender.
+
 ## [0.1.5] - 2026-10-27
 
 ### Added

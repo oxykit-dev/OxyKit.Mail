@@ -1,10 +1,7 @@
 using System.Net;
 using System.Text;
-using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using Moq;
-using Moq.Protected;
 using OxyKit.Mail.Features.Email.Configuration;
 using OxyKit.Mail.Features.Email.Services;
 

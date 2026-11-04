@@ -1,6 +1,5 @@
 using System.Net;
 using System.Text;
-using OxyKit.Mail.Client;
 using OxyKit.Mail.Contracts;
 
 namespace OxyKit.Mail.Client.Tests;

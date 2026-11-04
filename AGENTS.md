@@ -73,6 +73,7 @@ Shared libs (NuGet): `OxyKit.Observability` + `OxyKit.OpenTelemetry` — see [Ob
 - `X-Api-Key` → ApiKey scheme; else JWT Bearer
 - Roles: `Admin`, `User`, `Sender` (`AppRoles.*`)
 - Send: `Admin`|`Sender` + Bearer/ApiKey
+- **Sender = send-only** — no dashboard stats, no dashboard SignalR hub, no identity/users/DKIM admin. Dashboard REST + hub: `Admin`|`User` only. Align `oxykit-mail-web` nav/routes the same way (hide, do not 403-wall).
 - Bootstrap: anonymous `/setup/*` only when no admin exists
 - Secrets in `.env` / secrets manager — never commit real credentials
 - Strong JWT key (32+); keep rate limits and request size limits on

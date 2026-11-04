@@ -17,6 +17,12 @@
   </ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />
+    <Using Include="Moq" />
+    <Using Include="Moq.Protected" />
+    <Using Include="FluentAssertions" />
+    <Using Include="ErrorOr" />
+    <Using Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <Using Include="Microsoft.EntityFrameworkCore" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\OxyKit.Mail.Infrastructure\OxyKit.Mail.Infrastructure.csproj" />

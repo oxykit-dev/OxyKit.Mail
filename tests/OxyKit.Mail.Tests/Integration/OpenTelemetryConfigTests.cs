@@ -1,4 +1,3 @@
-using FluentAssertions;
 using OxyKit.Mail.Tests.Infrastructure;
 
 namespace OxyKit.Mail.Tests.Integration;

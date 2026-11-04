@@ -1,5 +1,3 @@
-using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using OxyKit.Mail.Infrastructure;
 
 namespace OxyKit.Mail.Tests.Infrastructure;

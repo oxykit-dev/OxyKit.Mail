@@ -1,6 +1,7 @@
 using System.Text;
 using FastEndpoints;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OxyKit.Mail.Common.Validators;
@@ -134,6 +135,23 @@ public static class ServiceCollectionExtensions
                                     Encoding.UTF8.GetBytes(jwtKey)
                                 ),
                         };
+                    // SignalR WebSockets cannot set Authorization; client sends ?access_token=
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            if (
+                                !string.IsNullOrEmpty(accessToken)
+                                && path.StartsWithSegments("/hubs")
+                            )
+                            {
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        },
+                    };
                 }
             );
 
