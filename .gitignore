@@ -6,6 +6,10 @@
 # dotenv files
 .env
 
+# Local smoke / tool output
+**/output/
+**/TestResults/
+
 # User-specific files
 *.rsuser
 *.suo

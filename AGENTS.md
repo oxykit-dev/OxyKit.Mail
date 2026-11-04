@@ -28,7 +28,7 @@ Token-efficient map. Prefer this over README / OpenAPI dumps.
 | Hoppscotch | `hoppscotch/` (do not paste JSON into chat) |
 | Config | `ENVIRONMENT_SETTINGS.md` |
 
-Ignore `bin/`, `obj/`, `TestResults/`.
+Ignore `bin/`, `obj/`, `output/`, `TestResults/`, `artifacts/`.
 
 ## Layout (canonical Pure VSA)
 
