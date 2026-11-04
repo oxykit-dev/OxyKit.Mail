@@ -119,6 +119,20 @@ Admin helpers: `POST /api/v1/email/dkim/generate-keys`, `GET /api/v1/email/dkim/
 | Request size | `RequestLimits__MaxRequestBodySize` (10 MB), `MaxEmailBodySize` / `MaxAttachmentSize` (5 MB) |
 | CORS | `Cors__AllowedOrigins__0` (e.g. `http://localhost:5173`), `Cors__AllowCredentials` |
 
+## Observability
+
+Implemented via suite packages `OxyKit.Observability` + `OxyKit.OpenTelemetry` (see [`../OxyKit.Observability/`](../OxyKit.Observability/) and [oxykit.dev/guide/observability](https://oxykit.dev/guide/observability)).
+
+| Setting | Notes |
+|---------|-------|
+| `Logging__JsonConsole` | Force JSON console on (`true`) or off (`false`); default JSON outside Development |
+| `OpenTelemetry__Enabled` | Opt-in OTLP traces + metrics (default `false`) |
+| `OpenTelemetry__ServiceName` | Resource service name (default `OxyKit.Mail`) |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | Also enables OTel when set (standard OTel env) |
+| `OTEL_SERVICE_NAME` | Overrides service name when set |
+
+Inbound/outbound correlation header: `X-Correlation-Id`.
+
 ## Where defaults live
 
 - `src/OxyKit.Mail/appsettings.json` — shared  

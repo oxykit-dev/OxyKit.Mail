@@ -60,6 +60,14 @@ Auth = FastEndpoints `Roles(...)` / schemes only — no DB permission table. `Me
 - Map: NotFound→404, Forbidden→403, Unauthorized→401, Validation/Conflict/other→FE errors body.
 - Unhandled: `ExceptionHandlingMiddleware` → `{ statusCode, message, errors }`.
 
+## Observability
+
+Shared libs (suite ProjectReference): `OxyKit.Observability` + `OxyKit.OpenTelemetry` — see [`../OxyKit.Observability/AGENTS.md`](../OxyKit.Observability/AGENTS.md).
+
+- **Logs / correlation:** `AddOxyKitJsonConsole` + `UseOxyKitCorrelation`
+- **OTel:** `AddOxyKitOpenTelemetry` with `MailTelemetry` source/meter names; off by default
+- Product meters stay in `Common/Observability/MailTelemetry.cs`
+
 ## Auth (do not weaken)
 
 - `X-Api-Key` → ApiKey scheme; else JWT Bearer

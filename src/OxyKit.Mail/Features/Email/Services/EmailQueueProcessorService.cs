@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.SignalR;
+using OxyKit.Mail.Common.Observability;
 using OxyKit.Mail.Infrastructure.Repositories;
 
 namespace OxyKit.Mail.Features.Email.Services;
@@ -38,6 +40,7 @@ public class EmailQueueProcessorService<THub>(
 
         if (queuedMessages.Count > 0)
         {
+            MailTelemetry.MessagesQueued.Add(queuedMessages.Count);
             logger.LogInformation(
                 "Picked up {Count} queued messages for processing.",
                 queuedMessages.Count
@@ -46,10 +49,21 @@ public class EmailQueueProcessorService<THub>(
 
         foreach (var message in queuedMessages)
         {
+            using var messageScope = logger.BeginScope(
+                new Dictionary<string, object> { ["MessageId"] = message.Id }
+            );
+            using var activity = MailTelemetry.ActivitySource.StartActivity(
+                "mail.message.send",
+                ActivityKind.Internal
+            );
+            activity?.SetTag("message.id", message.Id.ToString("D"));
+            activity?.SetTag("message.attempt", message.AttemptCount);
+
             // Mark as processing and save immediately (idempotency)
             message.MarkAsProcessing();
             await messageRepository.UpdateAsync(message, stoppingToken).ConfigureAwait(false);
 
+            var sw = Stopwatch.StartNew();
             try
             {
                 logger.LogInformation(
@@ -64,6 +78,8 @@ public class EmailQueueProcessorService<THub>(
                 message.MarkAsSent();
                 await messageRepository.UpdateAsync(message, stoppingToken).ConfigureAwait(false);
 
+                MailTelemetry.MessagesSent.Add(1);
+                activity?.SetStatus(ActivityStatusCode.Ok);
                 logger.LogInformation("Message {MessageId} sent successfully.", message.Id);
                 await hubContext
                     .Clients.All.SendAsync("EmailSent", stoppingToken)
@@ -71,6 +87,8 @@ public class EmailQueueProcessorService<THub>(
             }
             catch (Exception ex)
             {
+                MailTelemetry.MessagesFailed.Add(1);
+                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                 logger.LogError(ex, "Failed to send message {MessageId}", message.Id);
 
                 // Handle retry logic based on attempt count
@@ -97,6 +115,11 @@ public class EmailQueueProcessorService<THub>(
                 }
 
                 await messageRepository.UpdateAsync(message, stoppingToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                sw.Stop();
+                MailTelemetry.SendDurationMs.Record(sw.Elapsed.TotalMilliseconds);
             }
         }
     }

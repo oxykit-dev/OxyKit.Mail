@@ -5,13 +5,24 @@ using OxyKit.Mail.Common;
 using OxyKit.Mail.Common.Configuration;
 using OxyKit.Mail.Common.Extensions;
 using OxyKit.Mail.Common.Middleware;
+using OxyKit.Mail.Common.Observability;
 using OxyKit.Mail.Features.ApiKeys.Configuration;
 using OxyKit.Mail.Features.Dashboard;
 using OxyKit.Mail.Seed;
+using OxyKit.Observability;
+using OxyKit.OpenTelemetry;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load Development .env before observability so OTEL_* / OpenTelemetry__* apply.
 builder.ConfigureOxyKitMailEnvironment();
+builder.AddOxyKitJsonConsole();
+builder.AddOxyKitOpenTelemetry(o =>
+{
+    o.ServiceName = "OxyKit.Mail";
+    o.ActivitySources = [MailTelemetry.ActivitySourceName];
+    o.Meters = [MailTelemetry.MeterName];
+});
 builder.AddOxyKitMailDatabase();
 builder.AddOxyKitMailServices();
 builder.AddOxyKitMailAuthentication();
@@ -78,7 +89,10 @@ if (app.Environment.EnvironmentName != "Testing")
 }
 
 // Security middleware pipeline (order matters!)
-// 1. Security headers (must be first)
+// 0. Correlation (early so all request logs include the id)
+app.UseOxyKitCorrelation();
+
+// 1. Security headers
 app.UseMiddleware<SecurityHeadersMiddleware>();
 
 // 2. Request size limiting (before reading body)

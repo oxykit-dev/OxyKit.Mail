@@ -37,8 +37,11 @@ dotnet run --project src/OxyKit.Mail/OxyKit.Mail.csproj
 | `http://localhost:5026` | API |
 | `X-Api-Key` or Bearer JWT | Auth (create a sender key after bootstrap) |
 | `GET /health` | Health (SMTP probe may be Unhealthy) |
+| `X-Correlation-Id` | Optional; echoed on every response (generated if omitted) |
 | `/scalar`, `/openapi/v1.json` | OpenAPI UI + JSON (Development only) |
 | `/hubs/dashboard` | SignalR |
+
+Observability: shared [`OxyKit.Observability`](../OxyKit.Observability/) + [`OxyKit.OpenTelemetry`](../OxyKit.Observability/) (JSON stdout; optional OTLP via `OpenTelemetry:Enabled` or `OTEL_EXPORTER_OTLP_ENDPOINT`). See `AGENTS.md`, `ENVIRONMENT_SETTINGS.md`, and [oxykit.dev/guide/observability](https://oxykit.dev/guide/observability).
 
 First run: `GET /api/v1/setup/needs-admin`, then `POST /api/v1/setup/create-admin` if needed.
 

@@ -33,6 +33,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\OxyKit.Observability\src\OxyKit.Observability\OxyKit.Observability.csproj" />
+    <ProjectReference Include="..\..\..\OxyKit.Observability\src\OxyKit.OpenTelemetry\OxyKit.OpenTelemetry.csproj" />
     <ProjectReference Include="..\OxyKit.Mail.Contracts\OxyKit.Mail.Contracts.csproj" />
     <ProjectReference Include="..\OxyKit.Mail.Infrastructure.Postgres\OxyKit.Mail.Infrastructure.Postgres.csproj" />
     <ProjectReference Include="..\OxyKit.Mail.Infrastructure.Sqlite\OxyKit.Mail.Infrastructure.Sqlite.csproj" />
