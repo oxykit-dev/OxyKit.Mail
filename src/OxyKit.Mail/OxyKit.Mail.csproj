@@ -19,8 +19,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="MimeKit" Version="4.18.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.14" />
-    <PackageReference Include="MimeKit" Version="4.18.1" />
     <PackageReference Include="OxyKit.Observability" Version="0.1.1" />
     <PackageReference Include="OxyKit.OpenTelemetry" Version="0.1.1" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.18.2" />
