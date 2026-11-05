@@ -4,7 +4,7 @@ Token-efficient map. Prefer this over README / OpenAPI dumps.
 
 ## What it is
 
-**OxyKit** suite core. .NET 10 email delivery: queue + retries, DKIM, JWT + API keys, dashboard, SignalR. UI: sibling **`../oxykit-mail-web/`**.
+**OxyKit** suite core. .NET 10 email delivery: queue + retries, DKIM, JWT + API keys, dashboard, SignalR. Console: sibling **`../oxykit-console/`**.
 
 **MIT** · host version on `OxyKit.Mail`; Client/Contracts packable (nuget.org via Trusted Publishing / `release-nuget.yml` when their `<Version>` matches the tag). See `docs/NUGET_PUBLISH.md`.
 
@@ -21,6 +21,7 @@ Token-efficient map. Prefer this over README / OpenAPI dumps.
 | Identity / users | `src/OxyKit.Mail/Features/Identity/` |
 | API keys | `src/OxyKit.Mail/Features/ApiKeys/` |
 | Send / queue / DKIM / SMTP | `src/OxyKit.Mail/Features/Email/` |
+| Mail template packs | `src/OxyKit.Mail/Features/Templates/` (`subject.txt` + `body.html`; send via `templateId` + `data`) |
 | Dashboard / SignalR | `src/OxyKit.Mail/Features/Dashboard/` |
 | Roles / EF | `src/OxyKit.Mail.Infrastructure/AppRoles.cs`, `ApplicationDbContext.cs`, `Entities/` |
 | Migrations | `scripts/AddEfMigration.*.ps1`, provider `Migrations/` |
@@ -73,7 +74,9 @@ Shared libs (NuGet): `OxyKit.Observability` + `OxyKit.OpenTelemetry` — see [Ob
 - `X-Api-Key` → ApiKey scheme; else JWT Bearer
 - Roles: `Admin`, `User`, `Sender` (`AppRoles.*`)
 - Send: `Admin`|`Sender` + Bearer/ApiKey (`User` alone cannot send)
-- **Sender = send-only** — no dashboard stats, no dashboard SignalR hub, no identity/users/DKIM admin. Dashboard REST + hub: `Admin`|`User` only. Align `oxykit-mail-web` nav/routes the same way (hide, do not 403-wall).
+- Mail template packs: write `Admin`; list/get/pack `Admin`|`Sender`. Send with `templateId` + `data` renders `subject.txt` / `body.html` (body strings HTML-encoded; subject must stay one line)
+- **Sender = send-only** — `POST /email/send`, Me, and own password. No dashboard stats, no dashboard SignalR hub, no identity/users/DKIM admin. Dashboard REST + hub: `Admin`|`User` only. The Mail UI hides those screens; it does not 403-wall them.
+- Own password: `POST /auth/change-password` (v1), Bearer only, Admin|User|Sender. A wrong current password is validation **400**, never 401.
 - JWT Bearer `OnMessageReceived`: accept `access_token` query for paths under `/hubs` (SignalR WebSockets)
 - Bootstrap: anonymous `/setup/*` only when no admin exists
 - Secrets in `.env` / secrets manager — never commit real credentials
@@ -90,7 +93,7 @@ Shared libs (NuGet): `OxyKit.Observability` + `OxyKit.OpenTelemetry` — see [Ob
 7. Note in `CHANGELOG.md` `[Unreleased]` when behavior changes
 8. Send contract change → update `OxyKit.Mail.Contracts` + `MailClient` tests; host validators stay in Features/Email
 
-Do not change HTTP paths without coordinating `oxykit-mail-web`. **API shapes:** Scalar (`/scalar`) + `/openapi/v1.json` (Development; suite convention). Testing also serves `/openapi/v1.json` (no Scalar) for contract asserts / snapshot export.
+Do not change HTTP paths without coordinating `oxykit-console`. **API shapes:** Scalar (`/scalar`) + `/openapi/v1.json` (Development; suite convention). Testing also serves `/openapi/v1.json` (no Scalar) for contract asserts / snapshot export.
 
 After contract changes, regenerate the companion snapshot:
 
@@ -109,7 +112,7 @@ dotnet test tests/OxyKit.Mail.Tests/OxyKit.Mail.Tests.csproj
 dotnet test tests/OxyKit.Mail.Client.Tests/OxyKit.Mail.Client.Tests.csproj
 ```
 
-Frontend: `../oxykit-mail-web` with `VITE_BACKEND_URL=http://localhost:5026`.  
+Console: `../oxykit-console` (`npm run dev`; proxies `/api/v1` to `:5026`).  
 Hoppscotch: import `hoppscotch/*`, env **OxyKit.Mail Local**, run folders in order.
 
 Suite map: `../AGENTS.md`.

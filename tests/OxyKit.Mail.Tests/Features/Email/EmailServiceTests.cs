@@ -1,9 +1,11 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OxyKit.Mail.Contracts;
 using OxyKit.Mail.Features.Email.Configuration;
 using OxyKit.Mail.Features.Email.Services;
+using OxyKit.Mail.Features.Templates;
 using OxyKit.Mail.Infrastructure.Entities;
 using OxyKit.Mail.Infrastructure.Repositories;
 
@@ -16,6 +18,7 @@ public class EmailServiceTests
     private Mock<IHubContext<TestHub>> _hubContextMock = null!;
     private Mock<IHubClients> _hubClientsMock = null!;
     private Mock<IClientProxy> _clientProxyMock = null!;
+    private Mock<IMailTemplateStore> _templateStoreMock = null!;
     private EmailService<TestHub> _sut = null!;
     private CancellationToken _ct;
 
@@ -26,6 +29,7 @@ public class EmailServiceTests
         _hubContextMock = new Mock<IHubContext<TestHub>>();
         _hubClientsMock = new Mock<IHubClients>();
         _clientProxyMock = new Mock<IClientProxy>();
+        _templateStoreMock = new Mock<IMailTemplateStore>();
         _ct = CancellationToken.None;
 
         _hubContextMock.Setup(x => x.Clients).Returns(_hubClientsMock.Object);
@@ -56,6 +60,7 @@ public class EmailServiceTests
                 }
             ),
             _hubContextMock.Object,
+            _templateStoreMock.Object,
             Mock.Of<ILogger<EmailService<TestHub>>>()
         );
     }
@@ -324,6 +329,43 @@ public class EmailServiceTests
 
         result.IsError.Should().BeFalse();
         result.Value.Status.Should().Be(SendEmailStatus.Accepted);
+    }
+
+    [Fact]
+    public async Task AcceptAsync_WithTemplateId_RendersSubjectAndBody()
+    {
+        Message? persisted = null;
+        _messageRepoMock
+            .Setup(x => x.AddAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>()))
+            .Callback<Message, CancellationToken>((m, _) => persisted = m)
+            .Returns(Task.CompletedTask);
+
+        _templateStoreMock
+            .Setup(x => x.Render("welcome", It.IsAny<JsonElement?>()))
+            .Returns(new MailRenderedTemplate("Welcome, Ada", "<p>Hello Ada</p>"));
+
+        _senderServiceMock
+            .Setup(x => x.SendAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>()))
+            .Callback<Message, CancellationToken>((m, _) => m.MarkAsSent())
+            .ReturnsAsync(Result.Success);
+
+        var data = JsonSerializer.SerializeToElement(new { name = "Ada" });
+        var result = await _sut.AcceptAsync(
+            new SendEmailRequest
+            {
+                To = "recipient@example.com",
+                TemplateId = "welcome",
+                Data = data,
+            },
+            ct: _ct
+        );
+
+        result.IsError.Should().BeFalse();
+        result.Value.Status.Should().Be(SendEmailStatus.Sent);
+        persisted.Should().NotBeNull();
+        persisted!.Subject.Should().Be("Welcome, Ada");
+        persisted.Body.Should().Be("<p>Hello Ada</p>");
+        persisted.IsHtml.Should().BeTrue();
     }
 
     private static SendEmailRequest ValidRequest() =>

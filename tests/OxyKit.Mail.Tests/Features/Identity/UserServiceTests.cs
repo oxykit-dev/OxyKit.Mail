@@ -415,6 +415,63 @@ public class UserServiceTests
 
     #endregion
 
+    #region ChangePasswordAsync
+
+    [Fact]
+    public async Task ChangePasswordAsync_WithCurrentPassword_ShouldSucceed()
+    {
+        var user = new ApplicationUser { Id = "user-123", UserName = "testuser" };
+        var currentPassword = "CurrentPassword123!";
+        var newPassword = "NewPassword456!";
+
+        _userManagerMock
+            .Setup(x => x.ChangePasswordAsync(user, currentPassword, newPassword))
+            .ReturnsAsync(IdentityResult.Success);
+
+        var result = await _sut.ChangePasswordAsync(user, currentPassword, newPassword);
+
+        result.IsError.Should().BeFalse();
+        result.Value.Succeeded.Should().BeTrue();
+        _userManagerMock.Verify(
+            x => x.ChangePasswordAsync(user, currentPassword, newPassword),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task ChangePasswordAsync_WithWrongCurrentPassword_ShouldReturnValidationError()
+    {
+        var user = new ApplicationUser { Id = "user-123", UserName = "testuser" };
+        var errors = new[] { new IdentityError { Description = "Incorrect password." } };
+
+        _userManagerMock
+            .Setup(x => x.ChangePasswordAsync(user, "wrong", "NewPassword456!"))
+            .ReturnsAsync(IdentityResult.Failed(errors));
+
+        var result = await _sut.ChangePasswordAsync(user, "wrong", "NewPassword456!");
+
+        result.IsError.Should().BeTrue();
+        result.FirstError.Type.Should().Be(ErrorType.Validation);
+        result.FirstError.Description.Should().Contain("Incorrect password.");
+    }
+
+    [Fact]
+    public async Task ChangePasswordAsync_WhenUnchanged_ShouldNotCallIdentity()
+    {
+        var user = new ApplicationUser { Id = "user-123", UserName = "testuser" };
+
+        var result = await _sut.ChangePasswordAsync(user, "SamePassword123!", "SamePassword123!");
+
+        result.IsError.Should().BeTrue();
+        result.FirstError.Type.Should().Be(ErrorType.Validation);
+        _userManagerMock.Verify(
+            x => x.ChangePasswordAsync(user, It.IsAny<string>(), It.IsAny<string>()),
+            Times.Never
+        );
+    }
+
+    #endregion
+
     #region ValidatePasswordAsync
 
     [Fact]

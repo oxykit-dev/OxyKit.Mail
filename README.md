@@ -8,7 +8,7 @@ Email **delivery API** for the [OxyKit](https://oxykit.dev) suite: queue + retri
 
 **License:** MIT · **Org:** [oxykit-dev](https://github.com/oxykit-dev) · **Site:** [oxykit.dev](https://oxykit.dev)  
 **Releases:** [app zips](https://github.com/oxykit-dev/OxyKit.Mail/releases) · **Client:** [`OxyKit.Mail.Client`](https://www.nuget.org/packages/OxyKit.Mail.Client)  
-**Related:** [ENVIRONMENT_SETTINGS.md](./ENVIRONMENT_SETTINGS.md) · UI [oxykit-mail-web](https://github.com/oxykit-dev/oxykit-mail-web)
+**Related:** [ENVIRONMENT_SETTINGS.md](./ENVIRONMENT_SETTINGS.md) · Console [oxykit-console](https://oxykit.dev/mail/auth#console)
 
 ## Quick start
 
@@ -41,7 +41,9 @@ dotnet run --project src/OxyKit.Mail/OxyKit.Mail.csproj
 | `/scalar`, `/openapi/v1.json` | OpenAPI UI + JSON (Development only) |
 | `/hubs/dashboard` | SignalR (`Admin`\|`User`; JWT via `?access_token=` on `/hubs`) |
 
-**Roles:** Send = `Admin`\|`Sender`. `Sender` is otherwise send-only (no dashboard/hub/users/DKIM). Dashboard REST/hub: `Admin`\|`User`. Companion UI mirrors that — see [oxykit.dev/mail/auth](https://oxykit.dev/mail/auth).
+**Roles:** Send = `Admin`\|`Sender`. `Sender` is otherwise send-only (Me, own password, no dashboard/hub/users/DKIM). Dashboard REST/hub: `Admin`\|`User`. Own password: `POST /api/v1/auth/change-password` (Bearer). See [oxykit.dev/mail/auth](https://oxykit.dev/mail/auth).
+
+**Packs:** `subject.txt` + `body.html` under `MailTemplates__TemplatesRoot` (default `templates`). Send with `templateId` + JSON object `data` (HTML). Admin writes packs; Admin or Sender can read them. Compose stores them on `mail-data` at `/data/templates`.
 
 Observability: NuGet [`OxyKit.Observability`](https://www.nuget.org/packages/OxyKit.Observability) + [`OxyKit.OpenTelemetry`](https://www.nuget.org/packages/OxyKit.OpenTelemetry) (JSON stdout; optional OTLP via `OpenTelemetry:Enabled` or `OTEL_EXPORTER_OTLP_ENDPOINT`). See `AGENTS.md`, `ENVIRONMENT_SETTINGS.md`, and [oxykit.dev/guide/observability](https://oxykit.dev/guide/observability).
 
@@ -79,6 +81,7 @@ Local suite checkout (optional):
 | [AGENTS.md](./AGENTS.md) | Layout, auth, ErrorOr, change checklist |
 | [ENVIRONMENT_SETTINGS.md](./ENVIRONMENT_SETTINGS.md) | `.env` / config / DKIM / OAuth2 |
 | [oxykit.dev/mail](https://oxykit.dev/mail/) | Product docs |
+| [oxykit.dev/guide/iis](https://oxykit.dev/guide/iis) | Windows / IIS |
 | [hoppscotch/](./hoppscotch/) | Manual HTTP smoke |
 | [CHANGELOG.md](./CHANGELOG.md) | Keep a Changelog |
 | `/scalar` · `/openapi/v1.json` | Live API shapes (Development) |

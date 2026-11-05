@@ -19,6 +19,11 @@ public interface IUserService
     Task<ErrorOr<IdentityResult>> UpdateUserAsync(ApplicationUser user);
     Task<ErrorOr<IdentityResult>> DeleteUserAsync(ApplicationUser user);
     Task<ErrorOr<IdentityResult>> SetUserPasswordAsync(ApplicationUser user, string newPassword);
+    Task<ErrorOr<IdentityResult>> ChangePasswordAsync(
+        ApplicationUser user,
+        string currentPassword,
+        string newPassword
+    );
     Task<ErrorOr<bool>> ValidatePasswordAsync(ApplicationUser user, string password);
     Task<bool> AdminUserExistsAsync();
     Task<List<ApplicationUser>> GetAllUsersAsync();
@@ -168,6 +173,37 @@ public class UserService(UserManager<ApplicationUser> userManager, ILogger<UserS
         {
             logger.LogWarning(
                 "Failed to set password for user {UserId}: {Errors}",
+                user.Id,
+                string.Join(", ", result.Errors.Select(e => e.Description))
+            );
+            return Error.Validation(
+                description: string.Join("; ", result.Errors.Select(e => e.Description))
+            );
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Replaces the user's password after checking the current one.
+    /// </summary>
+    public async Task<ErrorOr<IdentityResult>> ChangePasswordAsync(
+        ApplicationUser user,
+        string currentPassword,
+        string newPassword
+    )
+    {
+        if (string.Equals(currentPassword, newPassword, StringComparison.Ordinal))
+        {
+            return Error.Validation(
+                description: "New password must be different from the current password."
+            );
+        }
+
+        var result = await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+        if (!result.Succeeded)
+        {
+            logger.LogWarning(
+                "Failed to change password for user {UserId}: {Errors}",
                 user.Id,
                 string.Join(", ", result.Errors.Select(e => e.Description))
             );

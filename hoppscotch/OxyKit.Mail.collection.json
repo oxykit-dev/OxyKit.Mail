@@ -208,6 +208,41 @@
           "requestVariables": [],
           "responses": {},
           "description": null
+        },
+        {
+          "v": "17",
+          "id": "mail-change-password",
+          "name": "POST /auth/change-password (wrong current password)",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/api/v1/auth/change-password",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<accessToken>>",
+              "active": true,
+              "description": ""
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"wrong current password is 400\", () => {\n  pw.expect(pw.response.status).toBe(400);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"currentPassword\": \"not-the-current-password\",\n  \"newPassword\": \"OxYk1t-Change-Me-9f3a!\",\n  \"confirmPassword\": \"OxYk1t-Change-Me-9f3a!\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Does not change the password. A real change uses the current password in currentPassword."
         }
       ],
       "auth": {
@@ -403,6 +438,51 @@
           "requestVariables": [],
           "responses": {},
           "description": "400 when DKIM disabled; 200 when configured."
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": ""
+    },
+    {
+      "v": 12,
+      "name": "Templates",
+      "variables": [],
+      "description": "Mail packs (subject.txt + body.html). List is Admin|Sender.",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "id": "mail-templates-list",
+          "name": "GET /templates",
+          "method": "GET",
+          "endpoint": "<<baseUrl>>/api/v1/templates",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<accessToken>>",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => pw.expect(pw.response.status).toBe(200));\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Seed pack id is welcome when the image templates were copied."
         }
       ],
       "auth": {

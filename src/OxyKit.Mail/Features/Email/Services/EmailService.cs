@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OxyKit.Mail.Contracts;
 using OxyKit.Mail.Features.Email.Configuration;
+using OxyKit.Mail.Features.Templates;
 using OxyKit.Mail.Infrastructure;
 using OxyKit.Mail.Infrastructure.Entities;
 using OxyKit.Mail.Infrastructure.Repositories;
@@ -36,6 +37,7 @@ public sealed class EmailService<THub>(
     ISenderService senderService,
     IOptions<SmtpSettings> smtpSettings,
     IHubContext<THub> hubContext,
+    IMailTemplateStore templateStore,
     ILogger<EmailService<THub>> logger
 ) : IEmailService
     where THub : Hub
@@ -58,6 +60,25 @@ public sealed class EmailService<THub>(
             var existing = await messageRepository.GetByIdempotencyKeyAsync(key, ct);
             if (existing is not null)
                 return ToResponse(existing);
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.TemplateId))
+        {
+            var rendered = templateStore.Render(request.TemplateId, request.Data);
+            if (rendered.IsError)
+                return rendered.Errors;
+
+            request = new SendEmailRequest
+            {
+                To = request.To,
+                Cc = request.Cc,
+                Bcc = request.Bcc,
+                Subject = rendered.Value.Subject,
+                Body = rendered.Value.HtmlBody,
+                IsHtml = true,
+                Attachments = request.Attachments,
+                ScheduledFor = request.ScheduledFor,
+            };
         }
 
         var message = EmailMapper.MapFromRequest(request, _smtpSettings);

@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `POST /api/v1/auth/change-password` — signed-in Admin, User, or Sender replaces their own password (current password required; Bearer only)
+- Mail template packs: `GET/PUT/DELETE /api/v1/templates/{id}`, `GET .../pack`; seed `templates/welcome/`
+- `SendEmailRequest.TemplateId` + `Data` — Scriban render of `subject.txt` / `body.html` (HTML-escape body strings; rendered subject must be one line); Admin pack CRUD, Admin|Sender list/get. Zip entries are capped while extracting
+- Compose: `MailTemplates__TemplatesRoot=/data/templates` on `mail-data` volume + seed entrypoint
+
 ## [0.1.6] - 2026-11-04
 
 ### Added

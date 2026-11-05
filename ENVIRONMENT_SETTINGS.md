@@ -119,6 +119,17 @@ Admin helpers: `POST /api/v1/email/dkim/generate-keys`, `GET /api/v1/email/dkim/
 | Request size | `RequestLimits__MaxRequestBodySize` (10 MB), `MaxEmailBodySize` / `MaxAttachmentSize` (5 MB) |
 | CORS | `Cors__AllowedOrigins__0` (e.g. `http://localhost:5173`), `Cors__AllowCredentials` |
 
+## Mail templates (`MailTemplates`)
+
+| Setting | Default | Notes |
+|---------|---------|-------|
+| `MailTemplates__TemplatesRoot` | `templates` | Relative to content root, or absolute. Pack is `subject.txt` + `body.html` |
+| `MailTemplates__MaxSubjectChars` | `10000` | |
+| `MailTemplates__MaxBodyChars` | `500000` | |
+| `MailTemplates__MaxTemplatePackBytes` | `2097152` | Zip upload cap (2 MiB) |
+
+Compose mounts this root at `/data/templates` and seeds it when empty. Send uses `templateId` + JSON object `data`.
+
 ## Observability
 
 Implemented via NuGet packages `OxyKit.Observability` + `OxyKit.OpenTelemetry` (see [oxykit.dev/guide/observability](https://oxykit.dev/guide/observability)).

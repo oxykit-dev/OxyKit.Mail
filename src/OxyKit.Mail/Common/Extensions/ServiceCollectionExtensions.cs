@@ -9,6 +9,7 @@ using OxyKit.Mail.Features.ApiKeys;
 using OxyKit.Mail.Features.Dashboard;
 using OxyKit.Mail.Features.Email;
 using OxyKit.Mail.Features.Identity;
+using OxyKit.Mail.Features.Templates;
 using OxyKit.Mail.Infrastructure;
 using OxyKit.Mail.Infrastructure.Entities;
 using OxyKit.Mail.Infrastructure.Postgres;
@@ -71,6 +72,7 @@ public static class ServiceCollectionExtensions
         // Feature-specific service registrations (Pure VSA)
         services.AddDashboardFeature();
         services.AddEmailFeature(configuration, skipBackgroundServices);
+        services.AddTemplatesFeature(configuration);
         services.AddIdentityFeature(configuration);
         services.AddApiKeysFeature();
 

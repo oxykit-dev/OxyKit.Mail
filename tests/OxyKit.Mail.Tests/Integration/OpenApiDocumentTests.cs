@@ -43,6 +43,7 @@ public class OpenApiDocumentTests : IDisposable
             .ToArray();
 
         pathKeys.Should().Contain(k => k.EndsWith("/email/send", StringComparison.Ordinal));
+        pathKeys.Should().Contain(k => k.EndsWith("/templates", StringComparison.Ordinal));
         pathKeys
             .Should()
             .Contain(

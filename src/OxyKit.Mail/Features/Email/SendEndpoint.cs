@@ -34,6 +34,8 @@ public class SendEndpoint(IEmailService emailService)
                 + "When 'scheduledFor' is set, status is 'scheduled' (HTTP 202). "
                 + "Immediate SMTP success returns status 'sent' (HTTP 200). "
                 + "Optional Idempotency-Key header returns the existing acceptance without creating a duplicate. "
+                + "Optional templateId + data renders subject.txt / body.html from MailTemplates:TemplatesRoot "
+                + "(IsHtml becomes true; subject/body in the request are ignored). "
                 + "Callers (e.g. OxyKit.Flow) must treat sent/accepted/scheduled as success and must not re-send. "
                 + "Rate limited to prevent spam (50 requests per minute by default).";
             s.ResponseExamples[200] = new SendEmailResponse
