@@ -95,10 +95,10 @@ Shared libs (NuGet): `OxyKit.Observability` + `OxyKit.OpenTelemetry` — see [Ob
 
 Do not change HTTP paths without coordinating `oxykit-console`. **API shapes:** Scalar (`/scalar`) + `/openapi/v1.json` (Development; suite convention). Testing also serves `/openapi/v1.json` (no Scalar) for contract asserts / snapshot export.
 
-After contract changes, regenerate the companion snapshot:
+To export an OpenAPI snapshot after contract changes:
 
 ```bash
-OXYKIT_EXPORT_OPENAPI="$(pwd)/../oxykit-mail-web/oxykit-mail-api.json" \
+OXYKIT_EXPORT_OPENAPI="$(pwd)/oxykit-mail-api.json" \
   dotnet test tests/OxyKit.Mail.Tests/OxyKit.Mail.Tests.csproj --filter OpenApiDocumentTests
 ```
 
