@@ -99,7 +99,7 @@ To export an OpenAPI snapshot after contract changes:
 
 ```bash
 OXYKIT_EXPORT_OPENAPI="$(pwd)/oxykit-mail-api.json" \
-  dotnet test tests/OxyKit.Mail.Tests/OxyKit.Mail.Tests.csproj --filter OpenApiDocumentTests
+  dotnet test --project tests/OxyKit.Mail.Tests/OxyKit.Mail.Tests.csproj --filter-class "*OpenApiDocumentTests"
 ```
 
 ## Commands
@@ -108,8 +108,8 @@ OXYKIT_EXPORT_OPENAPI="$(pwd)/oxykit-mail-api.json" \
 cd OxyKit.Mail
 dotnet build OxyKit.Mail.slnx
 dotnet run --project src/OxyKit.Mail/OxyKit.Mail.csproj   # :5026  Scalar /scalar
-dotnet test tests/OxyKit.Mail.Tests/OxyKit.Mail.Tests.csproj
-dotnet test tests/OxyKit.Mail.Client.Tests/OxyKit.Mail.Client.Tests.csproj
+dotnet test --project tests/OxyKit.Mail.Tests/OxyKit.Mail.Tests.csproj
+dotnet test --project tests/OxyKit.Mail.Client.Tests/OxyKit.Mail.Client.Tests.csproj
 ```
 
 Console: `../oxykit-console` (`npm run dev`; proxies `/api/v1` to `:5026`).  

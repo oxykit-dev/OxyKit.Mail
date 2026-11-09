@@ -50,8 +50,8 @@ Observability: NuGet [`OxyKit.Observability`](https://www.nuget.org/packages/Oxy
 First run: `GET /api/v1/setup/needs-admin`, then `POST /api/v1/setup/create-admin` if needed.
 
 ```bash
-dotnet test tests/OxyKit.Mail.Tests/OxyKit.Mail.Tests.csproj
-dotnet test tests/OxyKit.Mail.Client.Tests/OxyKit.Mail.Client.Tests.csproj
+dotnet test --project tests/OxyKit.Mail.Tests/OxyKit.Mail.Tests.csproj
+dotnet test --project tests/OxyKit.Mail.Client.Tests/OxyKit.Mail.Client.Tests.csproj
 ```
 
 **Smoke:** import [`hoppscotch/`](./hoppscotch/) collection + env → **OxyKit.Mail Local** → run folders in order.
