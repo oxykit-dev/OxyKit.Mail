@@ -490,3 +490,7 @@ $RECYCLE.BIN/
 # SQLite database files
 *.db
 App_Data/
+
+# Local agent/editor rules (not tracked)
+.cursor/
+.devin/
