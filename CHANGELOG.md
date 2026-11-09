@@ -2,6 +2,12 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Added
+
+- `Dockerfile` + `.github/workflows/docker.yml`: multi-arch image `ghcr.io/oxykit-dev/oxykit-mail` (release tags, `edge` from master)
+
 ## [0.1.7] - 2026-11-06
 
 ### Added

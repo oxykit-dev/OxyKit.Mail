@@ -116,3 +116,7 @@ Console: `../oxykit-console` (`npm run dev`; proxies `/api/v1` to `:5026`).
 Hoppscotch: import `hoppscotch/*`, env **OxyKit.Mail Local**, run folders in order.
 
 Suite map: `../AGENTS.md`.
+
+## Docker image
+
+`Dockerfile` (context = repo root) + `.github/workflows/docker.yml` publish `ghcr.io/oxykit-dev/oxykit-mail` for linux/amd64 + arm64: `v*` tag → `X.Y.Z`, `X.Y`, `latest`; `master` → `edge`; every build → `sha-<short>`. PRs build without pushing. The Compose stack + smoke test live in [oxykit-compose](https://github.com/oxykit-dev/oxykit-compose).
